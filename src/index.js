@@ -47,7 +47,7 @@ const todos = (state = [], action) => {
 };
   
 // reducer for visibility filter 
-const visibilityFilter = (state = 'SHOW_ALL', action) => {
+const visibilityFilter = (state = 'SHOW_ALL', action) => { 
     switch (action.type) {
         case 'SET_VISIBILITY_FILTER':
             return action.filter;
@@ -58,61 +58,188 @@ const visibilityFilter = (state = 'SHOW_ALL', action) => {
   
 // reducer for todos list and visibility filter
 // { stateKey : reducer }
-// since stateKey and reducer have the same names we can ommit ":"
+// stateKey and reducer have the same names so we can ommit ":"
+// ================
+// our store state:
+// {todos: [...], visibilityFilter: "..."}
+// at todos reducer state will be [...]
+// at visibilityFilter reducer state will be "..."
+// but action is the same for both of them
 const todoApp = combineReducers({
     todos,
     visibilityFilter
 });
   
 // specify todoApp as store reducer
+// redux runs dummy actions with undefined state to populate it
 const store = createStore(todoApp);
 
-//Todo App component
-let nextTodoId = 0;
-class App extends Component {
-    constructor(props) {
-        super(props);
-        this.input = React.createRef();
+// filter link component
+const FilterLink = ({
+    filter,
+    currentFilter,
+    children,
+    onClick
+}) => {
+    if (filter === currentFilter) {
+        return <span>{children}</span>
     }
 
-    render() {
-        return (
-            <div className="App">
-                <input ref={this.input} />
-                <button onClick={() => {
-                        store.dispatch({
-                        type: 'ADD_TODO',
-                        text: this.input.current.value,
-                        id: nextTodoId++
-                    });
-                    // this.input.current.value = "";
-                }}>
-                    Add todo
-                </button>
-                <ul>
-                    {this.props.todos.map(todo =>
-                        <li key={todo.id}
-                            onClick={() => {
-                                store.dispatch({
-                                    type: 'TOGGLE_TODO',
-                                    id: todo.id
-                                });
-                            }}
-                            className={todo.completed ? "todoCompleted" : "todoInProgress"}
-                        >
-                            {todo.text}
-                        </li>
-                    )}
-                </ul>
-            </div>
-        );
+    return (
+        <a href="#"
+        onClick={e => {
+            e.preventDefault();
+            onClick(filter);
+        }}
+        >
+            {children}
+        </a>
+    );
+};
+
+const Footer = ({
+    visibilityFilter,
+    onFilterClick
+}) => (
+    <p>
+        Show:
+        {' '}
+        <FilterLink
+            filter='SHOW_ALL'
+            currentFilter={visibilityFilter}
+            onClick={onFilterClick}
+        >
+            All
+        </FilterLink>
+        {' '}
+        <FilterLink
+            filter='SHOW_ACTIVE'
+            currentFilter={visibilityFilter}
+            onClick={onFilterClick}
+        >
+            Active
+        </FilterLink>
+        {' '}
+        <FilterLink
+            filter='SHOW_COMPLETED'
+            currentFilter={visibilityFilter}
+            onClick={onFilterClick}
+        >
+            Completed
+        </FilterLink>
+    </p>    
+)
+
+const Todo = ({
+    onClick,
+    completed,
+    text
+}) => (
+    <li
+        onClick={onClick}
+        className={completed ? "todoCompleted" : "todoInProgress"}
+    >
+        {text}
+    </li>    
+);
+
+const TodoList = ({
+    todos,
+    onTodoClick
+}) => (
+    <ul>
+        {todos.map(todo =>
+            <Todo
+                key={todo.id}
+                {...todo}
+                onClick={() => onTodoClick(todo.id)}
+            />
+        )}
+    </ul>
+);
+
+const AddTodo = ({
+    onAddClick
+}) => {
+    const input = React.useRef(null);
+
+    return (
+        <div>
+            <input ref={input} />
+            <button onClick={() => {
+                onAddClick(input.current.value)
+                input.current.value = '';
+            }}>
+                Add todo
+            </button>            
+        </div>
+    );
+};
+
+const getVisibleTodods = (
+    todos,
+    filter
+) => {
+    switch (filter) {
+        case 'SHOW_ALL':
+            return todos;
+        case 'SHOW_COMPLETED':
+            return todos.filter(
+                t => t.completed
+            );
+        case 'SHOW_ACTIVE':
+            return todos.filter(
+                t => !t.completed
+            )
     }
 }
 
-const render = () => {
+//Todo App component
+let nextTodoId = 0;
+const TodoApp = ({
+    todos,
+    visibilityFilter
+}) => (
+    <div className="App">
+        <AddTodo 
+            onAddClick={text =>
+                store.dispatch({
+                    type: 'ADD_TODO',
+                    text,
+                    id: nextTodoId++
+                })
+            }
+        />
+        <TodoList
+            todos={
+                getVisibleTodods(
+                    todos,
+                    visibilityFilter
+                )
+            }
+            onTodoClick={id =>
+                store.dispatch({
+                    type: 'TOGGLE_TODO',
+                    id
+                })
+            }
+        />
+        <Footer
+            visibilityFilter={visibilityFilter}
+            onFilterClick={filter =>
+                store.dispatch({
+                    type: 'SET_VISIBILITY_FILTER',
+                    filter
+                })
+            }
+        />
+    </div>
+);
+
+const render = () => { 
     ReactDOM.render(
-        <App 
-            todos={store.getState().todos}
+        <TodoApp 
+            {...store.getState()}
         />, 
         document.getElementById('root')
     );
@@ -122,6 +249,10 @@ const render = () => {
 store.subscribe(render);
 render();
 
+//prevents auto-reloading when saving
+if (module.hot) {
+    module.hot.accept();
+}
 
 
 // If you want your app to work offline and load faster, you can change
