@@ -73,6 +73,33 @@ const todoApp = combineReducers({
     visibilityFilter
 });
 
+// action creators
+// return objects that will be called with dispatch
+// ===============
+let nextTodoId = 0;
+const addTodo = (text) => {
+    return {
+        type: 'ADD_TODO',
+        id: nextTodoId++,
+        text
+    };
+};
+
+const toggleTodo = (id) => {
+    return {
+        type: 'TOGGLE_TODO',
+        id
+    };
+};
+
+const setVisibilityFilter = (filter) => {
+    return {
+        type: 'SET_VISIBILITY_FILTER',
+        filter
+    };
+};
+// ===============
+
 // specifies only appearance of link
 const Link = ({
     active,
@@ -107,10 +134,9 @@ const mapDispatchToLinkProps = (
  ) => {
     return {
         onClick: () => {
-        dispatch({
-            type: 'SET_VISIBILITY_FILTER',
-            filter: ownProps.filter
-        });
+            dispatch(
+                setVisibilityFilter(ownProps.filter)
+            );
         }
     };
  }
@@ -165,18 +191,13 @@ const TodoList = ({
     </ul>
 );
 
-let nextTodoId = 0;
 let AddTodo = ({ dispatch }) => {
     const input = React.useRef(null);
     return (
         <div>
             <input ref={input} />
             <button onClick={() => {
-                dispatch({
-                    type: 'ADD_TODO',
-                    text: input.current.value,
-                    id: nextTodoId++
-                });
+                dispatch(addTodo(input.value));
                 input.current.value = '';
             }}>
                 Add todo
@@ -222,10 +243,7 @@ const mapStateToTodoListProps = (state) => {
 const mapDispatchToTodoListProps = (dispatch) => {
     return {
         onTodoClick: (id) =>
-            dispatch({
-                type: 'TOGGLE_TODO',
-                id
-            })
+            dispatch(toggleTodo(id))
     };
 };
 const VisibleTodoList = connect(
