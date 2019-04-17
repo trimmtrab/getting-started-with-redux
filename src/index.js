@@ -1,13 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import App from './App';
-// import * as serviceWorker from './serviceWorker';
 import { createStore, combineReducers } from 'redux';
-import { Component } from 'react';
 import { Provider, connect } from 'react-redux';
 
-const MyContext = React.createContext();
 
 // reducer for a single todo element
 const todo = (state, action) => {
@@ -77,27 +73,21 @@ const todoApp = combineReducers({
 // return objects that will be called with dispatch
 // ===============
 let nextTodoId = 0;
-const addTodo = (text) => {
-    return {
-        type: 'ADD_TODO',
-        id: nextTodoId++,
-        text
-    };
-};
+const addTodo = (text) => ({
+    type: 'ADD_TODO',
+    id: nextTodoId++,
+    text
+});
 
-const toggleTodo = (id) => {
-    return {
-        type: 'TOGGLE_TODO',
-        id
-    };
-};
+const toggleTodo = (id) => ({
+    type: 'TOGGLE_TODO',
+    id
+});
 
-const setVisibilityFilter = (filter) => {
-    return {
-        type: 'SET_VISIBILITY_FILTER',
-        filter
-    };
-};
+const setVisibilityFilter = (filter) => ({
+    type: 'SET_VISIBILITY_FILTER',
+    filter
+});
 // ===============
 
 // specifies only appearance of link
@@ -131,15 +121,14 @@ const mapStateToLinkProps = (
 const mapDispatchToLinkProps = (
     dispatch,
     ownProps
- ) => {
-    return {
-        onClick: () => {
-            dispatch(
-                setVisibilityFilter(ownProps.filter)
-            );
-        }
-    };
- }
+ ) => ({
+    onClick() {
+        dispatch(
+            setVisibilityFilter(ownProps.filter)
+        );
+    }
+ })
+        
  const FilterLink = connect(
      mapStateToLinkProps,
      mapDispatchToLinkProps
@@ -197,7 +186,7 @@ let AddTodo = ({ dispatch }) => {
         <div>
             <input ref={input} />
             <button onClick={() => {
-                dispatch(addTodo(input.value));
+                dispatch(addTodo(input.current.value));
                 input.current.value = '';
             }}>
                 Add todo
@@ -231,21 +220,18 @@ const getVisibleTodods = (
 }
 
 // maps store state to props of todo component
-const mapStateToTodoListProps = (state) => {
-    return {
-        todos: getVisibleTodods(
-            state.todos,
-            state.visibilityFilter
-        )
-    };
-};
+const mapStateToTodoListProps = (state) => ({
+    todos: getVisibleTodods(
+        state.todos,
+        state.visibilityFilter
+    )
+});
 // maps dispatch method of store to props of todo component
-const mapDispatchToTodoListProps = (dispatch) => {
-    return {
-        onTodoClick: (id) =>
-            dispatch(toggleTodo(id))
-    };
-};
+const mapDispatchToTodoListProps = (dispatch) => ({
+    onTodoClick(id) {
+        dispatch(toggleTodo(id));
+    }
+});
 const VisibleTodoList = connect(
     mapStateToTodoListProps,
     mapDispatchToTodoListProps
