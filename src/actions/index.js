@@ -1,11 +1,11 @@
+import { v4 } from 'node-uuid';
+
 // action creators
 // return objects that will be called with dispatch
 
-let nextTodoId = 0;
-
 export const addTodo = (text) => ({
     type: 'ADD_TODO',
-    id: nextTodoId++,
+    id: v4(),
     text
 });
 
