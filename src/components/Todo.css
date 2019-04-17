@@ -1,0 +1,8 @@
+.todoCompleted {
+    text-decoration: line-through;
+}
+  
+.todoInProgress {
+    text-decoration: none;
+}
+ 
