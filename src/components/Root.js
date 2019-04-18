@@ -6,7 +6,10 @@ import App from './App'
 const Root = ({ store }) => (
     <Provider store={store}>
         <BrowserRouter>
-            <Route path='/' component={App} />
+            <div>
+            {/* path is an Express string */}
+            <Route path='/:filter?' component={App} />
+            </div>
         </BrowserRouter>
     </Provider>
 );
