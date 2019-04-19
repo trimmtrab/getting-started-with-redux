@@ -20,7 +20,7 @@ const todo = (state, action) => {
             return state;
     }
 };
-  
+
 // reducer for todos list
 const todos = (state = [], action) => {
     switch (action.type) {
@@ -39,3 +39,18 @@ const todos = (state = [], action) => {
 };
 
 export default todos;
+
+export const getVisibleTodods = ( state, filter ) => {
+    switch (filter) {
+        case 'all':
+            return state;
+        case 'completed':
+            return state.filter(
+                t => t.completed
+            );
+        case 'active':
+            return state.filter(
+                t => !t.completed
+            )
+    }
+};
