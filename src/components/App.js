@@ -8,9 +8,7 @@ import './App.css';
 const App = ({ match }) => (
     <div className="App">
         <AddTodo />
-        <VisibleTodoList
-            filter={match.params.filter || 'all'}
-        />
+        <VisibleTodoList />
         <Footer />
     </div>
 );
