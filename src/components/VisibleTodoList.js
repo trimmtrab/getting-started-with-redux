@@ -7,13 +7,13 @@ const getVisibleTodods = (
     filter
 ) => {
     switch (filter) {
-        case 'SHOW_ALL':
+        case 'all':
             return todos;
-        case 'SHOW_COMPLETED':
+        case 'completed':
             return todos.filter(
                 t => t.completed
             );
-        case 'SHOW_ACTIVE':
+        case 'active':
             return todos.filter(
                 t => !t.completed
             )
@@ -21,10 +21,10 @@ const getVisibleTodods = (
 };
 
 // maps store state to props of todo component
-const mapStateToTodoListProps = (state) => ({
+const mapStateToTodoListProps = (state, ownProps) => ({
     todos: getVisibleTodods(
         state.todos,
-        state.visibilityFilter
+        ownProps.filter
     )
 });
 
