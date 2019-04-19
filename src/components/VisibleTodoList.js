@@ -26,14 +26,10 @@ const mapStateToTodoListProps = (state, { match }) => ({
     todos: getVisibleTodods(state.todos, match.params.filter || 'all'),
 });
 
-// maps dispatch method of store to props of todo component
-const mapDispatchToTodoListProps = (dispatch) => ({
-    onTodoClick(id) {
-        dispatch(toggleTodo(id));
-    }
-});
-
 export default withRouter(connect(
     mapStateToTodoListProps,
-    mapDispatchToTodoListProps
+    // when mapDispatchToProps props have the same arguments
+    // as corresponding action creators
+    // we can use configuration object instead
+    { onTodoClick: toggleTodo }
 )(TodoList));
