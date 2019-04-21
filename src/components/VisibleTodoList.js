@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom';
 import * as actions from '../actions';
 import { getVisibleTodos } from '../reducers';
 import TodoList from './TodoList';
-import { fetchTodos } from '../api';
 
 // define component to use lifecycle hook
 class VisibleTodoList extends Component {
@@ -19,10 +18,8 @@ class VisibleTodoList extends Component {
     }
 
     fetchData() {
-        const { filter, receiveTodos } = this.props;
-        fetchTodos(this.props.filter).then(todos => {
-            receiveTodos(filter, todos);
-        })
+        const { filter, fetchTodos } = this.props; 
+        fetchTodos(filter);
     }
 
     render() {
